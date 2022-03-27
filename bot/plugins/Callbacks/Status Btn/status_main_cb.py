@@ -30,41 +30,41 @@ async def cb_status(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
-    
+
     chat_id = re.findall(r"status\((.+)\)", query_data)[0]
-    
+
     total_filters, total_chats, total_achats = await db.status(chat_id)
-    
+
     text = f"<b><i>Status Of {chat_name}</i></b>\n"
     text += f"\n<b>Total Connected Chats:</b> <code>{total_chats}</code>\n"
     text += f"\n<b>Total Active Chats:</b> <code>{total_achats}</code>\n"
     text += f"\n<b>Total Filters:</b> <code>{total_filters}</code>"
-    
+
     buttons = [
         [
             InlineKeyboardButton
                 (
                     "🔙 Back", callback_data="settings"
                 ),
-            
+
             InlineKeyboardButton
                 (
                     "Close 🔐", callback_data="close"
                 )
         ]
     ]
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text, reply_markup=reply_markup, parse_mode="html"
     )

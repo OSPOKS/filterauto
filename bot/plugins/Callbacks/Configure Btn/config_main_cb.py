@@ -33,43 +33,43 @@ async def cb_config(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     chat_id = re.findall(r"config\((.+)\)", query_data)[0]
-    
+
     settings = await db.find_chat(int(chat_id))
-    
+
     mp_count = settings["configs"]["max_pages"]
     mf_count = settings["configs"]["max_results"]
     mr_count = settings["configs"]["max_per_page"]
     show_invite = settings["configs"]["show_invite_link"]
     pm_file_chat  = settings["configs"].get("pm_fchat", False)
     accuracy_point = settings["configs"].get("accuracy", 0.80)
-    
+
     text=f"<i><b>Configure Your <u><code>{chat_name}</code></u> Group's Filter Settings...</b></i>\n"
-    
+
     text+=f"\n<i>{chat_name}</i> Current Settings:\n"
 
     text+=f"\n - Max Filter: <code>{mf_count}</code>\n"
-    
+
     text+=f"\n - Max Pages: <code>{mp_count}</code>\n"
-    
+
     text+=f"\n - Max Filter Per Page: <code>{mr_count}</code>\n"
 
     text+=f"\n - Accuracy Percentage: <code>{accuracy_point}</code>\n"
-    
+
     text+=f"\n - Show Invitation Link: <code>{show_invite}</code>\n"
-    
+
     text+=f"\n - Provide File In Bot PM: <code>{pm_file_chat}</code>\n"
-    
+
     text+="\nAdjust Above Value Using Buttons Below... "
     buttons=[
         [
@@ -77,7 +77,7 @@ async def cb_config(bot, update: CallbackQuery):
                 (
                     "Filter Per Page", callback_data=f"mr_count({mr_count}|{chat_id})"
                 ), 
-    
+
             InlineKeyboardButton
                 (
                     "Max Pages",       callback_data=f"mp_count({mp_count}|{chat_id})"
@@ -121,18 +121,11 @@ async def cb_config(bot, update: CallbackQuery):
     )
 
 
-    buttons.append(
-        [
-            InlineKeyboardButton
-                (
-                    "🔙 Back", callback_data=f"settings"
-                )
-        ]
-    )
-    
-    
+    buttons.append([InlineKeyboardButton("🔙 Back", callback_data="settings")])
+        
+
     reply_markup=InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text, 
         reply_markup=reply_markup, 

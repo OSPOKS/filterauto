@@ -21,7 +21,7 @@ from . import (
 db = Database()
 
 @Client.on_callback_query(filters.regex(r"channel_list\((.+)\)"), group=2)
-async def cb_channel_list(bot, update: CallbackQuery):    
+async def cb_channel_list(bot, update: CallbackQuery):
     """
     A Callback Funtion For Displaying All Channel List And Providing A Menu To Navigate
     To Every COnnect Chats For Furthur Control
@@ -36,77 +36,60 @@ async def cb_channel_list(bot, update: CallbackQuery):
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     chat_id =  re.findall(r"channel_list\((.+)\)", query_data)[0]
-    
+
     text = "<i>Semms Like You Dont Have Any Channel Connected...</i>\n\n<i>Connect To Any Chat To Continue With This Settings...</i>"
-    
+
     db_list = await db.find_chat(int(chat_id))
-    
+
     channel_id_list = []
     channel_name_list = []
-    
+
     if db_list:
         for x in db_list["chat_ids"]:
             channel_id = x["chat_id"]
             channel_name = x["chat_name"]
-            
+
             try:
-                if (channel_id == None or channel_name == None):
+                if channel_id is None or channel_name is None:
                     continue
             except:
                 break
-            
+
             channel_name = remove_emoji(channel_name).encode('ascii', 'ignore').decode('ascii')[:35]
             channel_id_list.append(channel_id)
             channel_name_list.append(channel_name)
-        
-    buttons = []
 
-    # For Future Update (Little Help Needed😪)
-    # buttons.append([
-    #     InlineKeyboardButton
-    #         (
-    #             "Global Connections", callback_data=f"global({chat_id})"
-    #         )
-    # ])
-
-
-    buttons.append(
-        [
-            InlineKeyboardButton
+    buttons = [[InlineKeyboardButton
                 (
                     "🔙 Back", callback_data="settings"
-                ),
-            
-            InlineKeyboardButton
+                ), InlineKeyboardButton
                 (
                     "Close 🔐", callback_data="close"
-                )
-        ]
-    ) 
+                )]]
 
     if channel_name_list:
-        
+
         text=f"<i>List Of Connected Channels With <code>{chat_name}</code> With There Settings..</i>\n"
-    
+
         for x in range(1, (len(channel_name_list)+1)):
             text+=f"\n<code>{x}. {channel_name_list[x-1]}</code>\n"
-    
+
         text += "\nChoose Appropriate Buttons To Navigate Through Respective Channels"
-    
-        
+
+
         btn_key = [
             "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", 
             "1️⃣1️⃣", "1️⃣2️⃣", "1️⃣3️⃣", "1️⃣4️⃣", "1️⃣5️⃣", "1️⃣6️⃣", "1️⃣7️⃣", 
             "1️⃣8️⃣", "1️⃣9️⃣", "2️⃣0️⃣" # Just In Case 😂🤣
         ]
-    
+
         for i in range(1, (len(channel_name_list) + 1)): # Append The Index Number of Channel In Just A Single Line
             if i == 1:
                 buttons.insert(0,
@@ -117,7 +100,7 @@ async def cb_channel_list(bot, update: CallbackQuery):
                         )
                     ]
                 )
-        
+
             else:
                 buttons[0].append(
                     InlineKeyboardButton
@@ -125,8 +108,8 @@ async def cb_channel_list(bot, update: CallbackQuery):
                             btn_key[i-1], callback_data=f"info({channel_id_list[i-1]}|{channel_name_list[i-1]})"
                         )
                 )
-    
-    
+
+
     reply_markup=InlineKeyboardMarkup(buttons)
 
     await update.message.edit_text(
@@ -147,33 +130,33 @@ async def cb_info(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     channel_id, channel_name = re.findall(r"info\((.+)\)", query_data)[0].split("|", 1)
-    
-    f_count = await db.cf_count(chat_id, int(channel_id)) 
+
+    f_count = await db.cf_count(chat_id, int(channel_id))
     active_chats = await db.find_active(chat_id)
 
     if active_chats: # Checks for active chats connected to a chat
         dicts = active_chats["chats"]
         db_cids = [ int(x["chat_id"]) for x in dicts ]
-        
+
         if int(channel_id) in db_cids:
             active_chats = True
             status = "Connected"
-            
+
         else:
             active_chats = False
             status = "Disconnected"
-            
+
     else:
         active_chats = False
         status = "Disconnected"
@@ -192,7 +175,7 @@ async def cb_info(bot, update: CallbackQuery):
                             (
                                 "🚨 Disconnect 🚨", callback_data=f"warn({channel_id}|{channel_name}|disconnect)"
                             ),
-                        
+
                         InlineKeyboardButton
                             (
                                 "Delete ❌", callback_data=f"warn({channel_id}|{channel_name}|c_delete)"
@@ -207,7 +190,7 @@ async def cb_info(bot, update: CallbackQuery):
                             (
                                 "💠 Connect 💠", callback_data=f"warn({channel_id}|{channel_name}|connect)"
                             ),
-                        
+
                         InlineKeyboardButton
                             (
                                 "Delete ❌", callback_data=f"warn({channel_id}|{channel_name}|c_delete)"
@@ -223,7 +206,7 @@ async def cb_info(bot, update: CallbackQuery):
                     )
             ]
     )
-    
+
     buttons.append(
             [
                 InlineKeyboardButton
@@ -234,7 +217,7 @@ async def cb_info(bot, update: CallbackQuery):
     )
 
     reply_markup = InlineKeyboardMarkup(buttons)
-        
+
     await update.message.edit_text(
             text, reply_markup=reply_markup, parse_mode="html"
         )

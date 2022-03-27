@@ -31,34 +31,34 @@ async def cb_types(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     chat_id = re.findall(r"types\((.+)\)", query_data)[0]
-    
+
     _types = await db.find_chat(int(chat_id))
-    
+
     text=f"<i>Filter Types Enabled/Disbled In <code>{chat_name}</code></i>\n"
-    
+
     _types = _types["types"]
     vid = _types["video"]
     doc = _types["document"]
     aud = _types["audio"]
-    
+
     buttons = []
-    
+
     if vid:
         text+="\n<i><b>Video Index:</b> Enabled</i>\n"
         v_e = "✅"
         vcb_data = f"toggle({chat_id}|video|False)"
-    
+
     else:
         text+="\n<i><b>Video Index:</b> Disabled</i>\n"
         v_e="❎"
@@ -84,25 +84,33 @@ async def cb_types(bot, update: CallbackQuery):
         a_e="❎"
         acb_data = f"toggle({chat_id}|audio|True)"
 
-    
+
     text+="\n<i>Below Buttons Will Toggle Respective Media Types As Enabled Or Disabled....\n</i>"
     text+="<i>This Will Take Into Action As Soon As You Change Them....</i>"
-    
-    buttons.append([InlineKeyboardButton(f"Video Index: {v_e}", callback_data=vcb_data)])
-    buttons.append([InlineKeyboardButton(f"Audio Index: {a_e}", callback_data=acb_data)])
-    buttons.append([InlineKeyboardButton(f"Document Index: {d_e}", callback_data=dcb_data)])
-    
-    buttons.append(
-        [
-            InlineKeyboardButton
-                (
-                    "🔙 Back", callback_data=f"settings"
+
+    buttons.extend(
+        (
+            [
+                InlineKeyboardButton(
+                    f"Video Index: {v_e}", callback_data=vcb_data
                 )
-        ]
+            ],
+            [
+                InlineKeyboardButton(
+                    f"Audio Index: {a_e}", callback_data=acb_data
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    f"Document Index: {d_e}", callback_data=dcb_data
+                )
+            ],
+            [InlineKeyboardButton("🔙 Back", callback_data="settings")],
+        )
     )
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text,
         reply_markup=reply_markup, 
@@ -120,33 +128,33 @@ async def cb_toggle(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     chat_id, types, val = re.findall(r"toggle\((.+)\)", query_data)[0].split("|", 2)
-    
+
     _types = await db.find_chat(int(chat_id))
-    
+
     _types = _types["types"]
     vid = _types["video"]
     doc = _types["document"]
     aud = _types["audio"]
-    
-    if types == "video":
-        vid = True if val=="True" else False
-    elif types == "audio":
-        aud = True if val=="True" else False
+
+    if types == "audio":
+        aud = val == "True"
     elif types == "document":
-        doc = True if val=="True" else False
-    
-        
+        doc = val == "True"
+            
+
+    elif types == "video":
+        vid = val == "True"
     settings = {
         "video": vid,
         "audio": aud,
@@ -154,31 +162,31 @@ async def cb_toggle(bot, update: CallbackQuery):
     }
 
     process = await db.update_settings(chat_id, settings)
-    
+
     if process:
         await update.answer(text="Filter Types Updated Sucessfully", show_alert=True)
-    
+
     else:
         text="Something Wrong Please Check Bot Log For More Information...."
         await update.answer(text, show_alert=True)
         return
-    
+
     _types = await db.find_chat(int(chat_id))
-    
+
     text =f"<i>Filter Types Enabled In <code>{update.message.chat.title}</code></i>\n"
-    
+
     _types = _types["types"]
     vid = _types["video"]
     doc = _types["document"]
     aud = _types["audio"]
-    
+
     buttons = []
-    
+
     if vid:
         text+="\n<i><b>Video Index:</b> Enabled</i>\n"
         v_e = "✅"
         vcb_data = f"toggle({chat_id}|video|False)"
-    
+
     else:
         text+="\n<i><b>Video Index:</b> Disabled</i>\n"
         v_e="❎"
@@ -204,25 +212,33 @@ async def cb_toggle(bot, update: CallbackQuery):
         a_e="❎"
         acb_data = f"toggle({chat_id}|audio|True)"
 
-    
+
     text+="\n<i>Below Buttons Will Toggle Respective Media Types As Enabled Or Disabled....\n</i>"
     text+="<i>This Will Take Into Action As Soon As You Change Them....</i>"
-    
-    buttons.append([InlineKeyboardButton(f"Video Index : {v_e}", callback_data=vcb_data)])
-    buttons.append([InlineKeyboardButton(f"Audio Index : {a_e}", callback_data=acb_data)])
-    buttons.append([InlineKeyboardButton(f"Document Index : {d_e}", callback_data=dcb_data)])
-    
-    buttons.append(
-        [
-            InlineKeyboardButton
-                (
-                    "🔙 Back", callback_data=f"settings"
+
+    buttons.extend(
+        (
+            [
+                InlineKeyboardButton(
+                    f"Video Index : {v_e}", callback_data=vcb_data
                 )
-        ]
+            ],
+            [
+                InlineKeyboardButton(
+                    f"Audio Index : {a_e}", callback_data=acb_data
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    f"Document Index : {d_e}", callback_data=dcb_data
+                )
+            ],
+            [InlineKeyboardButton("🔙 Back", callback_data="settings")],
+        )
     )
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text,
         reply_markup=reply_markup, 
