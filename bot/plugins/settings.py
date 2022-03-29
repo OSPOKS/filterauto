@@ -17,29 +17,30 @@ async def settings(bot, update):
     chat_id = update.chat.id
     user_id = update.from_user.id if update.from_user else None
     global CHAT_DETAILS
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
-    
+
     bot_info = await bot.get_me()
     bot_first_name= bot_info.first_name
-    
+
     text =f"<i>{bot_first_name}'s</i> Settings Pannel.....\n"
-    text+=f"\n<i>You Can Use This Menu To Change Connectivity And Know Status Of Your Every Connected Channel, Change Filter Types, Configure Filter Results And To Know Status Of Your Group...</i>"
-    
+    text += "\\n<i>You Can Use This Menu To Change Connectivity And Know Status Of Your Every Connected Channel, Change Filter Types, Configure Filter Results And To Know Status Of Your Group...</i>"
+
+
     buttons = [
         [
             InlineKeyboardButton
                 (
                     "Channels", callback_data=f"channel_list({chat_id})"
                 ), 
-            
+
             InlineKeyboardButton
                 (
                     "Filter Types", callback_data=f"types({chat_id})"
@@ -56,7 +57,7 @@ async def settings(bot, update):
                 (
                     "Status", callback_data=f"status({chat_id})"
                 ),
-            
+
             InlineKeyboardButton
                 (
                     "About", callback_data=f"about({chat_id})"
@@ -69,17 +70,17 @@ async def settings(bot, update):
                 )
         ]
     ]
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await bot.send_message (
-        
+
         chat_id=chat_id, 
         text=text, 
         reply_markup=reply_markup, 
         parse_mode="html",
         reply_to_message_id=update.message_id
-        
+
         )
 
 

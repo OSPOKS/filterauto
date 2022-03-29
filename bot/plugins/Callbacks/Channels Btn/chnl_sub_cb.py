@@ -31,12 +31,12 @@ async def cb_connect(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
 
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -44,11 +44,11 @@ async def cb_connect(bot, update: CallbackQuery):
 
     channel_id, channel_name = re.findall(r"connect\((.+)\)", query_data)[0].split("|", 1)
     channel_id = int(channel_id)
-    
+
     f_count = await db.cf_count(chat_id, channel_id)
-    
+
     add_active = await db.update_active(chat_id, channel_id, channel_name)
-    
+
     if not add_active:
         await update.answer(f"{channel_name} Is Aldready in Active Connection", show_alert=True)
         return
@@ -58,7 +58,7 @@ async def cb_connect(bot, update: CallbackQuery):
     text+=f"\n<i>Channel Name:</i> <code>{channel_name}</code>\n"
     text+=f"\n<i>Channel ID:</i> <code>{channel_id}</code>\n"
     text+=f"\n<i>Channel Files:</i> <code>{f_count}</code>\n"
-    text+=f"\n<i>Current Status:</i> <code>Connected</code>\n"
+    text += "\\n<i>Current Status:</i> <code>Connected</code>\\n"
 
     buttons = [
                 [
@@ -66,14 +66,14 @@ async def cb_connect(bot, update: CallbackQuery):
                         (
                             "🚨 Disconnect 🚨", callback_data=f"warn({channel_id}|{channel_name}|disconnect)"
                         ),
-                    
+
                     InlineKeyboardButton
                         (
                             "Delete ❌", callback_data=f"warn({channel_id}|{channel_name}|c_delete)"
                         )
                 ]
     ]
-    
+
     buttons.append(
             [
                 InlineKeyboardButton
@@ -82,7 +82,7 @@ async def cb_connect(bot, update: CallbackQuery):
                     )
             ]
     )
-    
+
     buttons.append(
             [
                 InlineKeyboardButton
@@ -92,9 +92,9 @@ async def cb_connect(bot, update: CallbackQuery):
             ]
     )
     await recacher(chat_id, False, True, bot, update)
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-        
+
     await update.message.edit_text(
             text, reply_markup=reply_markup, parse_mode="html"
         )
@@ -111,47 +111,47 @@ async def cb_disconnect(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     channel_id, channel_name = re.findall(r"connect\((.+)\)", query_data)[0].split("|", 1)
-    
+
     f_count = await db.cf_count(chat_id, int(channel_id))
-    
+
     remove_active = await db.del_active(chat_id, int(channel_id))
-    
+
     if not remove_active:
         await update.answer("Couldnt Full Fill YOur Request...\n Report This @CrazyBotszGrp Along With Bot's Log", show_alert=True)
         return
-    
+
     text= f"<i>Sucessfully Disconnected From</i> <code>{channel_name}</code>\n"
     text+=f"\n<i>Info About <b>{channel_name}</b></i>\n"
     text+=f"\n<i>Channel Name:</i> <code>{channel_name}</code>\n"
     text+=f"\n<i>Channel ID:</i> <code>{channel_id}</code>\n"
     text+=f"\n<i>Channel Files:</i> <code>{f_count}</code>\n"
-    text+=f"\n<i>Current Status:</i> <code>Disconnected</code>\n"
-    
+    text += "\\n<i>Current Status:</i> <code>Disconnected</code>\\n"
+
     buttons = [ 
                 [
                     InlineKeyboardButton
                         (
                             "💠 Connect 💠", callback_data=f"warn({channel_id}|{channel_name}|connect)"
                         ),
-                    
+
                     InlineKeyboardButton
                         (
                             "Delete ❌", callback_data=f"warn({channel_id}|{channel_name}|c_delete)"
                         )
                 ]
     ]
-    
+
     buttons.append(
             [
                 InlineKeyboardButton
@@ -160,7 +160,7 @@ async def cb_disconnect(bot, update: CallbackQuery):
                     )
             ]
     )
-    
+
     buttons.append(
             [
                 InlineKeyboardButton
@@ -169,9 +169,9 @@ async def cb_disconnect(bot, update: CallbackQuery):
                     )
             ]
     )
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await recacher(chat_id, False, True, bot, update)
 
     await update.message.edit_text(
@@ -190,11 +190,11 @@ async def cb_channel_delete(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -202,7 +202,7 @@ async def cb_channel_delete(bot, update: CallbackQuery):
 
     channel_id, channel_name = re.findall(r"c_delete\((.+)\)", query_data)[0].split("|", 1)
     channel_id = int(channel_id)
-    
+
     c_delete = await db.del_chat(chat_id, channel_id)
     a_delete = await db.del_active(chat_id, channel_id) # pylint: disable=unused-variable
     f_delete = await db.del_filters(chat_id, channel_id)
@@ -211,7 +211,8 @@ async def cb_channel_delete(bot, update: CallbackQuery):
         text=f"<code>{channel_name} [ {channel_id} ]</code> Has Been Sucessfully Deleted And All Its Files Were Cleared From DB...."
 
     else:
-        text=f"<i>Couldn't Delete Channel And All Its Files From DB Sucessfully....</i>\n<i>Please Try Again After Sometimes...Also Make Sure To Check The Logs..!!</i>"
+        text = "<i>Couldn't Delete Channel And All Its Files From DB Sucessfully....</i>\\n<i>Please Try Again After Sometimes...Also Make Sure To Check The Logs..!!</i>"
+
         await update.answer(text=text, show_alert=True)
 
     buttons = [
@@ -220,7 +221,7 @@ async def cb_channel_delete(bot, update: CallbackQuery):
                 (
                     "🔙 Back", callback_data=f"channel_list({chat_id})"
                 ),
-                
+
             InlineKeyboardButton
                 (
                     "Close 🔐", callback_data="close"
@@ -229,7 +230,7 @@ async def cb_channel_delete(bot, update: CallbackQuery):
     ]
 
     await recacher(chat_id, True, True, bot, update)
-    
+
     reply_markup=InlineKeyboardMarkup(buttons)
 
     await update.message.edit_text(
@@ -247,11 +248,11 @@ async def cb_filters_delete(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -274,7 +275,7 @@ async def cb_filters_delete(bot, update: CallbackQuery):
                 (
                     "Back", callback_data="settings"
                 ),
-            
+
             InlineKeyboardButton
                 (
                     "Close", callback_data="close"

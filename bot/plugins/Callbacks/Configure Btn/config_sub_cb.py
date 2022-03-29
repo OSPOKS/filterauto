@@ -31,11 +31,11 @@ async def cb_max_buttons(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -108,20 +108,20 @@ async def cb_max_page(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     count, chat_id = re.findall(r"mp_count\((.+)\)", query_data)[0].split("|", 1)
-    
+
     text = f"<i>Choose Your Desired 'Max Filter Page Count' For Every Filter Results Shown In</i> <code>{chat_name}</code>"
-    
+
     buttons = [
 
         [
@@ -162,9 +162,9 @@ async def cb_max_page(bot, update: CallbackQuery):
         ]
 
     ]
-    
+
     reply_markup = InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text, reply_markup=reply_markup, parse_mode="html"
     )
@@ -181,11 +181,11 @@ async def cb_max_results(bot, update: CallbackQuery):
     chat_id = update.message.chat.id
     chat_name = remove_emoji(update.message.chat.title)
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -258,21 +258,19 @@ async def cb_show_invites(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
         return
 
     value, chat_id = re.findall(r"show_invites\((.+)\)", query_data)[0].split("|", 1)
-    
-    value = True if value=="True" else False
-    
-    if value:
+
+    if value := value == "True":
         buttons= [
             [
                 InlineKeyboardButton
@@ -287,7 +285,7 @@ async def cb_show_invites(bot, update: CallbackQuery):
                     )
             ]
         ]
-    
+
     else:
         buttons =[
             [
@@ -303,11 +301,12 @@ async def cb_show_invites(bot, update: CallbackQuery):
                     )
             ]
         ]
-    
-    text=f"<i>This Config Will Help You To Show Invitation Link Of All Active Chats Along With The Filter Results For The Users To Join.....</i>"
-    
+
+    text = "<i>This Config Will Help You To Show Invitation Link Of All Active Chats Along With The Filter Results For The Users To Join.....</i>"
+
+
     reply_markup=InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text,
         reply_markup=reply_markup,
@@ -325,11 +324,11 @@ async def cb_pm_file(bot, update: CallbackQuery):
     query_data = update.data
     chat_id = update.message.chat.id
     user_id = update.from_user.id
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
 
     if user_id not in chat_admins:
@@ -337,9 +336,7 @@ async def cb_pm_file(bot, update: CallbackQuery):
 
     value, chat_id = re.findall(r"inPM\((.+)\)", query_data)[0].split("|", 1)
 
-    value = True if value=="True" else False
-    
-    if value:
+    if value := value == "True":
         buttons= [
             [
                 InlineKeyboardButton
@@ -354,7 +351,7 @@ async def cb_pm_file(bot, update: CallbackQuery):
                     )
             ]
         ]
-    
+
     else:
         buttons =[
             [
@@ -370,11 +367,12 @@ async def cb_pm_file(bot, update: CallbackQuery):
                     )
             ]
         ]
-    
-    text=f"<i>This Config Will Help You To Enable/Disable File Transfer Through Bot PM Without Redirecting Them To Channel....</i>"
-    
+
+    text = "<i>This Config Will Help You To Enable/Disable File Transfer Through Bot PM Without Redirecting Them To Channel....</i>"
+
+
     reply_markup=InlineKeyboardMarkup(buttons)
-    
+
     await update.message.edit_text(
         text,
         reply_markup=reply_markup,
@@ -394,21 +392,21 @@ async def cb_accuracy(bot, update: CallbackQuery):
     chat_name = update.message.chat.title
     user_id = update.from_user.id
     query_data = update.data
-    
+
     chat_dict = CHAT_DETAILS.get(str(chat_id))
     chat_admins = chat_dict.get("admins") if chat_dict != None else None
 
-    if ( chat_dict or chat_admins ) == None: # Make Admin's ID List
+    if ((chat_dict or chat_admins)) is None: # Make Admin's ID List
         chat_admins = await admin_list(chat_id, bot, update)
-    
+
     if user_id not in chat_admins:
         return
 
     val, chat_id = re.findall(r"accuracy\((.+)\)", query_data)[0].split("|", 1)
-    
+
     text = f"<i>Choose Your Desired 'Accuracy Perceentage' For Every Filter Results Shown In</i> <code>{chat_name}</code>\n\n"
-    text+= f"<i>NB: Higher The Value Better Matching Results Will Be Provided... And If Value Is Lower It Will Show More Results \
-        Which Is Fimilary To Query Search (Wont Be Accurate)....</i>"
+    text += "<i>NB: Higher The Value Better Matching Results Will Be Provided... And If Value Is Lower It Will Show More Results \\\x1f        Which Is Fimilary To Query Search (Wont Be Accurate)....</i>"
+
 
     buttons = [
         [
