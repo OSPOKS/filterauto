@@ -324,12 +324,10 @@ class Database:
         """
         if self.acache.get(str(group_id)):
             self.acache.get(str(group_id))
-        
+
         connection = await self.acol.find_one({"_id": group_id})
 
-        if connection:
-            return connection
-        return False
+        return connection or False
 
 
     async def in_active(self, group_id: int, channel_id: int):
