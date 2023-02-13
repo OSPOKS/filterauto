@@ -52,8 +52,6 @@ async def cb_types(bot, update: CallbackQuery):
     doc = _types["document"]
     aud = _types["audio"]
 
-    buttons = []
-
     if vid:
         text+="\n<i><b>Video Index:</b> Enabled</i>\n"
         v_e = "✅"
@@ -88,27 +86,16 @@ async def cb_types(bot, update: CallbackQuery):
     text+="\n<i>Below Buttons Will Toggle Respective Media Types As Enabled Or Disabled....\n</i>"
     text+="<i>This Will Take Into Action As Soon As You Change Them....</i>"
 
-    buttons.extend(
-        (
-            [
-                InlineKeyboardButton(
-                    f"Video Index: {v_e}", callback_data=vcb_data
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    f"Audio Index: {a_e}", callback_data=acb_data
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    f"Document Index: {d_e}", callback_data=dcb_data
-                )
-            ],
-            [InlineKeyboardButton("🔙 Back", callback_data="settings")],
-        )
-    )
-
+    buttons = [
+        [InlineKeyboardButton(f"Video Index: {v_e}", callback_data=vcb_data)],
+        [InlineKeyboardButton(f"Audio Index: {a_e}", callback_data=acb_data)],
+        [
+            InlineKeyboardButton(
+                f"Document Index: {d_e}", callback_data=dcb_data
+            )
+        ],
+        [InlineKeyboardButton("🔙 Back", callback_data="settings")],
+    ]
     reply_markup = InlineKeyboardMarkup(buttons)
 
     await update.message.edit_text(
@@ -151,7 +138,7 @@ async def cb_toggle(bot, update: CallbackQuery):
         aud = val == "True"
     elif types == "document":
         doc = val == "True"
-            
+
 
     elif types == "video":
         vid = val == "True"
@@ -179,8 +166,6 @@ async def cb_toggle(bot, update: CallbackQuery):
     vid = _types["video"]
     doc = _types["document"]
     aud = _types["audio"]
-
-    buttons = []
 
     if vid:
         text+="\n<i><b>Video Index:</b> Enabled</i>\n"
@@ -216,27 +201,16 @@ async def cb_toggle(bot, update: CallbackQuery):
     text+="\n<i>Below Buttons Will Toggle Respective Media Types As Enabled Or Disabled....\n</i>"
     text+="<i>This Will Take Into Action As Soon As You Change Them....</i>"
 
-    buttons.extend(
-        (
-            [
-                InlineKeyboardButton(
-                    f"Video Index : {v_e}", callback_data=vcb_data
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    f"Audio Index : {a_e}", callback_data=acb_data
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    f"Document Index : {d_e}", callback_data=dcb_data
-                )
-            ],
-            [InlineKeyboardButton("🔙 Back", callback_data="settings")],
-        )
-    )
-
+    buttons = [
+        [InlineKeyboardButton(f"Video Index : {v_e}", callback_data=vcb_data)],
+        [InlineKeyboardButton(f"Audio Index : {a_e}", callback_data=acb_data)],
+        [
+            InlineKeyboardButton(
+                f"Document Index : {d_e}", callback_data=dcb_data
+            )
+        ],
+        [InlineKeyboardButton("🔙 Back", callback_data="settings")],
+    ]
     reply_markup = InlineKeyboardMarkup(buttons)
 
     await update.message.edit_text(
